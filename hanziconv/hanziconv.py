@@ -39,6 +39,63 @@ class HanziConv(object):
     __simplified_charmap = simplified_charmap
 
     @classmethod
+    def ignore_char_map(cls, simplified_chars, traditional_chars):
+        """
+        :param simplified_chars: str
+        :param traditional_chars: str
+        :returns: None
+        for example: '郄' => '郤'
+        """
+        if len(simplified_chars) != len(traditional_chars):
+            raise ValueError(
+                'length of simplified_chars is not equal to traditional_chars')
+
+        for simplified_char in simplified_chars.split():
+            cls.__simplified_charmap = cls.__simplified_charmap.replace(
+                simplified_char, '')
+
+        for traditional_char in traditional_chars.split():
+            cls.__traditional_charmap = cls.__traditional_charmap.replace(
+                traditional_char, '')
+
+        if len(cls.__simplified_charmap) != len(cls.__traditional_charmap):
+            raise ValueError(
+                'simplified_chars don\'t match to traditional_chars')
+
+    @classmethod
+    def extend_char_map(cls, simplified_chars, traditional_chars):
+        """
+        :param simplified_chars: str
+        :param traditional_chars: str
+        :returns: None
+        for example: '修暨熙褒既德卫群撰宾' => '脩曁熈襃旣悳衞羣譔賔'
+        """
+        if len(simplified_chars) != len(traditional_chars):
+            raise ValueError(
+                'length of simplified_chars is not equal to traditional_chars')
+
+        extra_simplified_chars = []
+        for simplified_char in simplified_chars.split():
+            if simplified_char in cls.__simplified_charmap:
+                continue
+            else:
+                extra_simplified_chars.append(simplified_char)
+
+        extra_traditional_chars = []
+        for traditional_char in traditional_chars.split():
+            if traditional_char in cls.__traditional_charmap:
+                continue
+            else:
+                extra_traditional_chars.append(traditional_char)
+
+        if len(extra_simplified_chars) != len(extra_traditional_chars):
+            raise ValueError(
+                'simplified_chars don\'t match to traditional_chars')
+
+        cls.__simplified_charmap += ''.join(extra_simplified_chars)
+        cls.__traditional_charmap += ''.join(extra_traditional_chars)
+
+    @classmethod
     def __convert(cls, text, toTraditional=True):
         """Convert `text` to Traditional characters if `toTraditional` is
         True, else convert to simplified characters
